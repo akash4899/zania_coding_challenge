@@ -15,11 +15,10 @@ import json
 app = Flask(__name__)
 
 model_name = ''
-# Load the OpenAI model (You can replace this with another model)
-llm = OpenAI(model=model_name)  # Replace with the LLM model you intend to use
-qa_chain = load_qa_chain(llm, chain_type="stuff")  # Loading a question answering chain
+llm = OpenAI(model=model_name)
+qa_chain = load_qa_chain(llm, chain_type="stuff")
 
-# Helper function to read PDF
+# Helper function to load PDF
 def read_pdf(file_path):
     loader = PyPDFLoader(file_path)
     pages = loader.load()
@@ -38,13 +37,13 @@ def answer_questions():
     # Load the document (PDF or JSON)
     document_file = request.files['document']
     document_text = ""
-    print(document_file.filename)
-    if document_file.filename.endswith('.pdf'):
+    print(document_file.content_type)
+    if document_file.content_type == "application/pdf":
         # Handle PDF document
-        pdf_path = os.path.join("../downloaded_documents", document_file.filename)
+        pdf_path = os.path.join("..\downloaded_documents", document_file.filename)
         document_file.save(pdf_path)
         document_text = read_pdf(pdf_path)
-    elif document_file.filename.endswith('.json'):
+    elif document_file.content_type == "application/json":
         # Handle JSON document
         document_text = json.load(document_file)
     else:
